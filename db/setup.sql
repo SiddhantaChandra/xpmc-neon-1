@@ -1,20 +1,33 @@
-<?php
-// Database configuration
-$host = 'mysql'; // Use the service name defined in docker-compose
-$username = 'root';
-$password = 'root';
-$database = 'agency_x_users';
+-- Create Database
+CREATE DATABASE IF NOT EXISTS agency_x_users 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
 
-// Create connection
-$conn = mysqli_connect($host, $username, $password, $database);
+-- Use the database
+USE agency_x_users;
 
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+-- Create Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NULL,
+    last_name VARCHAR(50) NULL,
+    role ENUM('admin', 'user', 'manager') NOT NULL DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    profile_image VARCHAR(255) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-// Set character set to UTF-8
-mysqli_set_charset($conn, 'utf8mb4');
-
-echo "✅ Connected to MySQL successfully!";
-?>
+-- Insert admin user
+INSERT INTO users (username, email, password_hash, first_name, last_name, role)
+VALUES (
+    'root', 
+    'root@agencyx.com', 
+    'root',
+    'Agency', 
+    'Admin', 
+    'admin'
+) ON DUPLICATE KEY UPDATE username=username;
